@@ -33,6 +33,20 @@
       cursor: pointer;
     }
 
+    .todoListMain .theList {
+      list-style: none;
+      padding-left: 0;
+      width: 255px;
+    }
+
+    .todoListMain .theList li {
+      color: #333;
+      background-color: rgba(255, 255, 255, .5);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+
   </style>
   <body>
 
@@ -43,16 +57,59 @@
       <script type="text/babel">
         var destination = document.querySelector("#container");
 
+        var TodoItems = React.createClass({
+          render: function() {
+            var todoEntries = this.props.entries;
+            function createTasks(item) {
+              return <li key={item.key}>{item.text}</li>
+            }
+
+            var listItems = todoEntries.map(createTasks);
+
+            return (
+              <ul className="theList">
+                {listItems}
+              </ul>
+            );
+          }
+        });
+
         var TodoList = React.createClass({
+
+          getInitialState: function() {
+            return {
+              items: []
+            };
+          },
+          addItem: function(e) {
+            var itemArray = this.state.items;
+
+            itemArray.push(
+              {
+                text: this._inputElement.value,
+                key:  Date.now()
+              }
+            );
+
+            this.setState({
+              items: itemArray
+            });
+
+            this._inputElement.value = "";
+            e.preventDefault();
+          },
+
           render: function() {
             return (
               <div className="todoListMain">
                 <div className="header">
-                  <form>
-                    <input placeholder="enter task" />
+                  <form onSubmit={this.addItem}>
+                    <input ref={(a) => this._inputElement = a}
+                        placeholder="enter task" />
                     <button type="submit">add</button>
                   </form>
                 </div>
+                <TodoItems entries={this.state.items}/>
               </div>
             );
           }
